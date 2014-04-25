@@ -1,4 +1,4 @@
-package com.sl.clicket.domain;
+package com.sl.clicket.domain; 
 
 import android.os.CountDownTimer;
 import android.widget.TextView;
