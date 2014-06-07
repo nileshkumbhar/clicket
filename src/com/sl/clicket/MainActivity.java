@@ -2,8 +2,16 @@ package com.sl.clicket;
 
 import java.util.List;
 
+import com.google.ads.Ad;
+import com.google.ads.AdListener;
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
+import com.google.ads.AdRequest.ErrorCode;
+import com.google.ads.InterstitialAd;
 import com.sl.clicket.dao.DatabaseHandler;
 import com.sl.clicket.entity.HighScore;
+import com.sl.clicket.util.Calculator;
 import com.sl.clicket.util.CustomCountDownTimer;
 import com.sl.clicket.util.CustomTimer;
 
@@ -27,6 +35,7 @@ import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.Html;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
@@ -49,8 +58,11 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Scroller;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 @SuppressLint("NewApi")
 public class MainActivity extends Activity
@@ -74,7 +86,14 @@ public class MainActivity extends Activity
     Dialog resultPopup;
     Button insidePopupButton;
     TextView popupText;
+    SoundPool sounds;
+    int clockSound;
+    int bellHappy;
+    
+    private int[] gameStatus = new int[16];
+    private InterstitialAd interstitial;
 
+    
 	@Override
 	public void onContentChanged() {
 		//doNothing
@@ -94,11 +113,64 @@ public class MainActivity extends Activity
         init();
         popupInit();
         
+        
+        
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
+        HomeActivity.showAd(R.layout.main, R.id.top_main_ad, LayoutInflater.from(this), (LinearLayout)findViewById(R.id.tableRow1), savedInstanceState);
+
         setContentView(R.layout.main);
+        
+     // Create the interstitial.
+        interstitial = new InterstitialAd(this, "a15361716b05982");
+
+        // Create ad request.
+        AdRequest adRequest = new AdRequest();
+
+        // Begin loading your interstitial.
+        interstitial.loadAd(adRequest);
+        
+     // Set the AdListener.
+        interstitial.setAdListener(new AdListener() {
+          
+
+			@Override
+			public void onDismissScreen(Ad arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+	
+			@Override
+			public void onFailedToReceiveAd(Ad arg0, ErrorCode errorCode) {
+				String message = String.format("onAdFailedToLoad (%s)", errorCode.values());
+	            Toast.makeText(mainActivity, message, Toast.LENGTH_SHORT).show();
+			}
+	
+			@Override
+			public void onLeaveApplication(Ad arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+	
+			@Override
+			public void onPresentScreen(Ad arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+	
+			@Override
+			public void onReceiveAd(Ad arg0) {
+	            Toast.makeText(mainActivity, "onAdLoaded", Toast.LENGTH_SHORT).show();
+			}
+        });
+        
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        
+        sounds = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);  
+        clockSound = sounds.load(this, R.raw.clock_tick_loop, 1);
+        bellHappy = sounds.load(this, R.raw.bell_happy, 1);
 
         /*MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.clock_tick_loop);
         mediaPlayer.setLooping(true);
@@ -123,7 +195,7 @@ public class MainActivity extends Activity
 		Button timerTitleButton = createTopButton(102, R.drawable.level);
 //		levelButton.setTextColor(Color.BLACK);
 		timerTitleButton.setText("TIMER");
-		timerTitleButton.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
+//		timerTitleButton.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
 		timerTitleButton.setTextSize(18);
 		timerTitleButton.setTextColor(Color.RED);
 		gridLayout.addView(timerTitleButton);
@@ -142,7 +214,7 @@ public class MainActivity extends Activity
 		gridLayout.addView(levelButton);*/
 		
 		Button scoreTitleButton = createTopButton(104, R.drawable.score);
-		scoreTitleButton.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
+//		scoreTitleButton.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
 		scoreTitleButton.setTextSize(16);
 		scoreTitleButton.setTextColor(Color.GREEN);
 		scoreTitleButton.setText("SCORE");
@@ -164,9 +236,9 @@ public class MainActivity extends Activity
 		
 		LinearLayout linearLayout = new LinearLayout(this);
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
-        popupText.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
-        popupText.setTextSize(24);
-        linearLayout.setPadding(50, 50, 50, 50);
+//        popupText.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
+        popupText.setTextSize(18);
+//        linearLayout.setPadding(50, 50, 50, 50);
 //        linearLayout.addView(popupText);
 //        resultPopup.setContentView(linearLayout);
         if(timer == null){
@@ -186,6 +258,19 @@ public class MainActivity extends Activity
 		for(int i = 1; i<=16; i++){
 			gridLayout.addView(createButton(""+i, timer));
 	    }
+		
+		
+		final Context context = this;
+		Button homeButton = createPurpleButton("HOME");
+		homeButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(context, HomeActivity.class);
+				startActivity(intent);
+			}
+		});
+		gridLayout.addView(homeButton);
 		
 		Button resetButton = createPurpleButton("RESET");
 		
@@ -212,9 +297,6 @@ public class MainActivity extends Activity
 		});
 		gridLayout.addView(instructionsButton);
 		
-		
-		Button settingsButton = createPurpleButton("LEVEL");
-		gridLayout.addView(settingsButton);
 		
 		/*TextView textView = new TextView(this);
 		//textView.setText("1");
@@ -253,9 +335,17 @@ public class MainActivity extends Activity
         linearLayout.setOrientation(LinearLayout.VERTICAL);
 //        layoutOfPopup.setBackgroundColor(Color.CYAN);
 //        insidePopupButton.setText("OK");
-        popupText.setText("This is Popup Window.press OK to dismiss it.");
-        popupText.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
-        popupText.setTextSize(22);
+        StringBuffer instructions = new StringBuffer();
+        instructions.append("&#8226; Buttons are shuffled across the panel.<BR /><BR />");
+        instructions.append("&#8226; Click the button to move it to adjacent empty space.<BR /><BR />");
+        instructions.append("&#8226; Rearrange all the buttons in a sequence before timer is up. <BR /><BR />");
+        instructions.append("&#8226; RED buttons will eat some of your time. <BR /><BR />");
+        instructions.append("&#8226; GREEN buttons will give you some extra time to solve the puzzle.<BR/>");
+        
+        popupText.setTextSize(18);
+        popupText.setText(Html.fromHtml(instructions.toString()));
+
+        
         
         final Button closeButton = new Button(this);
 //        imageButton.setBackground(getResources().getDrawable(R.drawable.btn_red));
@@ -267,21 +357,21 @@ public class MainActivity extends Activity
 			}
 		});*/
         
-        closeButton.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
+//        closeButton.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
     	closeButton.setText("OK");
-    	closeButton.setOnTouchListener(new View.OnTouchListener() {
+    	/*closeButton.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				closeButton.setBackground(getResources().getDrawable(R.drawable.button_bg_pressed));
 				return false;
 			}
-    	});
+    	});*/
     	
     	closeButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				popupMessage.dismiss();
-				closeButton.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
+//				closeButton.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
 			}
 		});
         
@@ -296,6 +386,8 @@ public class MainActivity extends Activity
         layoutOfPopup.addView(linearLayout);
     }
     
+    
+    
     public void popupInit() {
     	/*popupMessage = new PopupWindow(layoutOfPopup, LayoutParams.FILL_PARENT,
                 LayoutParams.WRAP_CONTENT);
@@ -309,7 +401,7 @@ public class MainActivity extends Activity
     	helpScrollView.addView(layoutOfPopup);
     	
     	
-    	helpScrollView.setPadding(50, 0, 50, 0);
+//    	helpScrollView.setPadding(50, 0, 50, 0);
     	popupMessage.setContentView(helpScrollView);
 //    	
     	popupMessage.getWindow().setLayout(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -371,34 +463,34 @@ public class MainActivity extends Activity
     	TextView scoreTextView = new TextView(this);
     	StringBuffer scoreBuffer = new StringBuffer();
     	if(highScores != null && !highScores.isEmpty()){
-//    		scoreBuffer.append("LEVEL     SCORE\n");
+//    		scoreBuffer.append("LEVEL     SCORE<BR/>");
 	    	for(HighScore highScore : highScores){
-	    		scoreBuffer.append("LEVEL "+highScore.getLevel()+"     "+highScore.getScore()+"\n");
+	    		scoreBuffer.append("LEVEL "+highScore.getLevel()+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+highScore.getScore()+"<BR/>");
 	    	}
     	}else{
     		scoreBuffer.append("No high score is recorded yet. Solve the puzzle and create the new one!");
     	}
-
-    	scoreTextView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
-    	scoreTextView.setTextSize(22);
-    	scoreTextView.setText(scoreBuffer.toString());
+    	scoreBuffer.append("<BR/>");
+//    	scoreTextView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
+    	scoreTextView.setTextSize(18);
+    	scoreTextView.setText(Html.fromHtml(scoreBuffer.toString()));
     	
     	final Button closeButton = new Button(this);
-      closeButton.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
+//    	closeButton.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
     	closeButton.setText("OK");
-    	closeButton.setOnTouchListener(new View.OnTouchListener() {
+    	/*closeButton.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				closeButton.setBackground(getResources().getDrawable(R.drawable.button_bg_pressed));
 				return false;
 			}
-    	});
+    	});*/
     	
     	closeButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				highScoreDialog.dismiss();
-				closeButton.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
+//				closeButton.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
 			}
 		});
       
@@ -412,7 +504,7 @@ public class MainActivity extends Activity
     	
       scrollView.addView(scoresLayout);
       
-      scrollView.setPadding(50, 0, 50, 0);
+//      scrollView.setPadding(50, 0, 50, 0);
     	highScoreDialog.setContentView(scrollView);
 //    	
     	highScoreDialog.getWindow().setLayout(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -429,6 +521,14 @@ public class MainActivity extends Activity
 		});
     	
     }
+    
+    public void displayInterstitial() {
+        if (interstitial.isReady()) {
+          interstitial.show();
+        }
+    }
+
+    
     @SuppressLint("NewApi")
 	private Button createPurpleButton(String label){
     	Button button = new Button(this);
@@ -466,15 +566,15 @@ public class MainActivity extends Activity
 		    linearLayout.setOrientation(LinearLayout.VERTICAL);
 		   
 		    TextView messageTextView = new TextView(mainActivity);
-		    messageTextView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
-		    messageTextView.setTextSize(24);
-		    messageTextView.setText(message);
+//		    messageTextView.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/BRUSHSCI.TTF"));
+		    messageTextView.setTextSize(18);
+		    messageTextView.setText(Html.fromHtml(message+" <BR/>"));
 	
 			Button nextLevelBtn = createDialogInsideButton("NEXT LEVEL >>");
 		    
 			linearLayout.addView(messageTextView);
 			linearLayout.addView(nextLevelBtn);
-			linearLayout.setPadding(50, 50, 50, 50);
+//			linearLayout.setPadding(50, 50, 50, 50);
 			resultPopup.setContentView(linearLayout);
 			resultPopup.show();
 //		    setContentView(linearLayout);
@@ -508,21 +608,22 @@ public class MainActivity extends Activity
 		nextLevelBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View view){
-				nextLevelBtn.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
+//				nextLevelBtn.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
+				displayInterstitial();
 				MainActivity.GAME_LEVEL = MainActivity.GAME_LEVEL + 1;
 				startActivity(new Intent(mainActivity, MainActivity.class));
 			}
 		});
 		nextLevelBtn.setVisibility(View.VISIBLE);
 		
-		nextLevelBtn.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
+		/*nextLevelBtn.setBackground(getResources().getDrawable(R.drawable.button_bg_normal));
 		nextLevelBtn.setOnTouchListener(new View.OnTouchListener() {
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
 					nextLevelBtn.setBackground(getResources().getDrawable(R.drawable.button_bg_pressed));
 					return false;
 				}
-	    	});
+	    	});*/
 	    	
 		return nextLevelBtn;
 	}
@@ -531,14 +632,15 @@ public class MainActivity extends Activity
 		TextView textView = new TextView(mainActivity);
 		textView.setId(100+id);
 		textView.setTextSize(23);
-//		textView.setBackgroundColor(Color.rgb(0, 40, 81));
+//		textView.setHeight(AdSize.BANNER.getHeight());
+//		textView.setBackgroundColor(Color.RED);
 		return textView;
 	} 
 	
 	private Button createTopButton(int id, int resourceId){
 		Button button = new Button(this);
 		button.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		button.setTextSize(SCREEN_WIDTH/30);
+		button.setTextSize(SCREEN_WIDTH/20);
 		button.setWidth(SCREEN_WIDTH/4);
 		button.setHeight(SCREEN_WIDTH/4);
 		button.setId(id);
@@ -640,12 +742,20 @@ public class MainActivity extends Activity
 		//((TextView)findViewById(99)).setText(view.getId()+"-"+((Button)view).getText());
 
 	    //((TextView)findViewById(99)).setText(""+newGame);
+		sounds.play(bellHappy, 1.0f, 1.0f, 0, 0, 1.5f);
 		Button invisibleButton = findAdjusantInvisibleButton(view.getId());
 		
 		if(invisibleButton != null){
 			invisibleButton.setText(((Button)view).getText());
+			/*try{
+				invisibleButton.setText(Calculator.createExpression(Integer.parseInt(((Button)view).getText().toString())));
+			}catch(Throwable e){
+				e.printStackTrace();
+			}*/
 		    invisibleButton.setVisibility(Button.VISIBLE);
 		    //((Button)view).setVisibility(Button.INVISIBLE);
+		    
+//		    ((Button)view).setText(""+Calculator.evaluateExpression(((Button)view).getText().toString()));
 		    makeInvisible((Button)view);
 		}
 		//((TextView)findViewById(99)).setText(""+isResolved());
@@ -662,28 +772,24 @@ public class MainActivity extends Activity
 				highScore.setScore(currentLevelScore);
 				db.updateHighScore(highScore);
 				message.append("                                  ");
-				message.append("Congratulations! \nNew high score for level "+GAME_LEVEL + " - " + currentLevelScore);
+				message.append("Congratulations! <BR/>New high score for level "+GAME_LEVEL + " - " + currentLevelScore);
 			}else if (highScore == null){
 				highScore = new HighScore();
 				highScore.setLevel(GAME_LEVEL);
 				highScore.setScore(currentLevelScore);
 				db.add(highScore);
 				message.append("                                  ");
-				message.append("Congratulations! \nNew high score for level "+GAME_LEVEL+ " - " + currentLevelScore);
+				message.append("Congratulations! <BR/>New high score for level "+GAME_LEVEL+ " - " + currentLevelScore);
 			}else{
 				message.append("Level "+ GAME_LEVEL + " completed.");
 			}
-			message.append("\nTotal score "+score);
+			message.append("<BR/>Total score "+score);
 			showMessageScreen("", message.toString(), timer.getTimer());//. Total score - "+((TextView)findViewById(102)).getText());
 		}else {
 			String scoreText = ((TextView)findViewById(101)).getText().toString();
 			if(scoreText != null && !scoreText.trim().equals("")){
 				long currentLevelScore = Long.parseLong(""+((TextView)findViewById(101)).getText())+(10000*(GAME_LEVEL-1));
-				if(currentLevelScore < 600000/GAME_LEVEL){
-					setVolumeControlStream(AudioManager.STREAM_MUSIC);
-			        
-			        SoundPool sounds = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);  
-			        int clockSound = sounds.load(this, R.raw.clock_tick_loop, 1);  
+				if(currentLevelScore < 10000){
 			        int clockSoundStream = sounds.play(clockSound, 1.0f, 1.0f, 0,-1, 1.5f);  
 				}
 			}
@@ -760,9 +866,9 @@ public class MainActivity extends Activity
 		((Button)findViewById(id)).setTextColor(Color.rgb(255, 183, 111));
 		int shuffle = (int)(Math.random()*100);
 		System.out.println(shuffle+" ========================= "+GAME_LEVEL);
-		if(shuffle < GAME_LEVEL-1 ){
+		if(GAME_LEVEL > 12 && shuffle < GAME_LEVEL-1 ){
 			((Button)findViewById(id)).setBackground(getResources().getDrawable(R.drawable.btn_red));
-		}else if(shuffle <= 2*GAME_LEVEL && shuffle < 100){
+		}else if(GAME_LEVEL > 8 && shuffle <= 2*GAME_LEVEL && shuffle < 100){
 			((Button)findViewById(id)).setBackground(getResources().getDrawable(R.drawable.btn_green));
 		}/*else if(shuffle == 4){
 			System.out.println("===========  GOLDEN  ===============");
@@ -780,7 +886,7 @@ public class MainActivity extends Activity
 		for(int i = 0; i<999; i++){
 			int btnId = (int)(Math.random()*16)+1;
 			Button button = findAdjusantInvisibleButton(btnId);
-			if(button != null){
+			if(16-btnId <= 2*GAME_LEVEL && button != null){
 				((Button)findViewById(btnId)).performClick();
 			}
 		    //findViewById(btnId).performClick();
@@ -788,8 +894,27 @@ public class MainActivity extends Activity
 			//Thread.sleep(1000);
 			//((Button) findViewById(16)).setText(btnId);
 		}
+		if(isResolved() || isSimilarToPriviousGame()){
+			restartGame(timer);
+		}
+		populateGameStatus();
 		newGame = false;
 		timer.start();
+	}
+	
+	private void populateGameStatus(){
+		for(int i=1; i<=16 ; i++){
+			gameStatus[i-1] = Integer.parseInt(((Button)findViewById(i)).getText().toString().trim());
+		}
+		System.out.println("gameStatus ===> "+gameStatus);
+	}
+	
+	private boolean isSimilarToPriviousGame(){
+		int [] currentGameStatus = new int[16];
+		for(int i=1; i<=16 ; i++){
+			currentGameStatus[i-1] = Integer.parseInt(((Button)findViewById(i)).getText().toString().trim());
+		}
+		return currentGameStatus.equals(gameStatus);
 	}
 	
 }

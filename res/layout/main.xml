@@ -4,14 +4,31 @@
 	android:layout_height="wrap_content" 
 	android:orientation="horizontal"
 	android:id="@+id/linearLayout"> -->
-	
-    <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:columnCount="4"
-	    android:rowCount="1"
-	    android:id="@+id/gridLayout">
-	
+
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+    android:id="@+id/tableLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+ 
+    <!-- 2 columns -->
+    
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="0dip" 
+        android:layout_weight="1">
+	    
+	    <GridLayout
+			android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:columnCount="4"
+		    android:rowCount="1"
+	    	android:id="@+id/gridLayout">
+	    
+        
+	    
         <!-- <Button
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -40,5 +57,28 @@
 		android:text="4" 
 		android:textSize="40sp"
 		android:width="90dp"/>  -->
-	</GridLayout>
+		
+		</GridLayout>
+	
 <!-- </LinearLayout> -->
+
+	</TableRow>
+	
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="0dip" >
+ 
+        <com.google.ads.AdView
+	        xmlns:googleads="http://schemas.android.com/apk/lib/com.google.ads"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+			ads:loadAdOnCreate="true"
+	        android:id="@+id/top_main_ad"
+	        googleads:adSize="BANNER"
+	        googleads:adUnitId="a15361716b05982" />
+        
+     </TableRow>
+     
+</TableLayout>
