@@ -1,12 +1,8 @@
 package com.sl.clicket;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
@@ -48,32 +44,6 @@ public class PopupDemoActivity extends Activity {
                 LayoutParams.WRAP_CONTENT);
         popupMessage.setContentView(layoutOfPopup);
         
-    	/*popupButton.setOnClickListener(new View.OnClickListener() {
-		
-			@Override
-			public void onClick(View v) {
-				try { 
-					// We need to get the instance of the LayoutInflater 
-					LayoutInflater inflater = (LayoutInflater) PopupDemoActivity.this 
-							.getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
-					View layout = inflater.inflate(R.layout.popupdemo,(ViewGroup)
-	
-					findViewById(R.id.popup_element)); 
-					PopupWindow pwindo = new PopupWindow(layout, 350, 350, true); 
-					pwindo.showAtLocation(layout, Gravity.CENTER, 0, 0);
-	
-	//				btnClosePopup = (Button) layout.findViewById(R.id.btn_close_popup); 
-	//				btnClosePopup.setOnClickListener(cancel_button_click_listener);
-	
-					
-				} catch (Exception e) { 
-					e.printStackTrace(); 
-				}
-			
-//				popupMessage.showAsDropDown(popupButton, 0, 0);
-			}
-    	});*/
-        
     	insidePopupButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -82,18 +52,4 @@ public class PopupDemoActivity extends Activity {
 			}
 		});
     }
- 
- /*   @Override
-    public void onClick(View v) {
- 
-        if (v.getId() == 999) {
-            popupMessage.showAsDropDown(popupButton, 0, 0);
-        }
- 
-        else {
-            popupMessage.dismiss();
-        }
-    }*/
 }
-
-

@@ -1,26 +1,18 @@
 package com.sl.clicket.util;
 
-import com.sl.clicket.MainActivity; 
-import com.sl.clicket.R;
-
 import android.annotation.TargetApi;
-import android.app.ActionBar.LayoutParams;
 import android.app.Dialog;
-import android.content.ContextWrapper;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.text.Html;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
+
+import com.google.ads.InterstitialAd;
+import com.sl.clicket.MainActivity;
 
 public class CustomTimer {
 	private long remainingTime;
@@ -29,13 +21,15 @@ public class CustomTimer {
     private Button scoreButton;
     private Dialog resultPopup;
     private long score;
+    private InterstitialAd interstitial;
     
-	public CustomTimer(Button timerButton, Button scoreButton, Dialog resultPopup, long score) {
+	public CustomTimer(Button timerButton, Button scoreButton, Dialog resultPopup, long score, InterstitialAd interstitial) {
 		this.timerButton = timerButton;
 		this.scoreButton = scoreButton;
 		this.resultPopup = resultPopup;
 		this.score = score;
-	}
+		this.interstitial = interstitial;
+	} 
 
     public void addTime(long addedTimeInMillis) {
       createNewTimer(remainingTime + addedTimeInMillis);
@@ -49,59 +43,38 @@ public class CustomTimer {
 	
 	       @Override
 	       public void onTick(final long millisUntilFinished) {
-	           remainingTime = millisUntilFinished;
-	           timerButton.setText(""+remainingTime*MainActivity.GAME_LEVEL/10);
-//	           timerButton.setText(""+remainingTime*MainActivity.GAME_LEVEL);
-	           
-	           
+	    	   if(timerButton.getText().toString().trim().equalsIgnoreCase("0")){
+	    		   onFinish();
+	    	   }else{
+	    		   remainingTime = millisUntilFinished;
+	    		   timerButton.setText(""+remainingTime*MainActivity.GAME_LEVEL/10);
+//	           		timerButton.setText(""+remainingTime*MainActivity.GAME_LEVEL);
+	    	   }
 	       }
 	
 	       @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	       @Override
 	       public void onFinish() {
+	    	   timerButton.setText("0");
+	    	   MainActivity.GAME_LEVEL = 0;
 	    	   TextView popupText = new TextView(resultPopup.getContext());
-//	    	   popupText.setTypeface(Typeface.createFromAsset(new ContextWrapper(resultPopup.getContext()).getAssets(), "fonts/BRUSHSCI.TTF"));
 	           popupText.setTextSize(18);
-	    	   popupText.setText(Html.fromHtml("Game finished! Final Score is " + score + " <BR/>"));
+	    	   popupText.setText(Html.fromHtml("Game finished! <BR/>"));
 	    	   final Button playAgainButton = new Button(resultPopup.getContext());
-//	    	   playAgainButton.setLayoutParams(new ViewGroup.LayoutParams(
-//						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 	    	   playAgainButton.setTextSize(14);
 	    	   playAgainButton.setText("PLAY AGAIN");
-//	    	   playAgainButton.setBackground(resultPopup.getContext().getResources().getDrawable(R.drawable.button_bg_normal));
-	    	   /*playAgainButton.setOnTouchListener(new View.OnTouchListener() {
-	   				@Override
-	   				public boolean onTouch(View v, MotionEvent event) {
-	   					playAgainButton.setBackground(resultPopup.getContext().getResources().getDrawable(R.drawable.button_bg_pressed));
-	   					return false;
-	   				}
-	   	    	});*/
-//	    	   playAgainButton.setBackground(resultPopup.getContext().getResources().getDrawable(
-//						R.drawable.btn17));
-
-	    	   /*playAgainButton.setOnTouchListener(new View.OnTouchListener() {
-					@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-					@Override
-					public boolean onTouch(View v, MotionEvent event) {
-						if (event.getAction() == MotionEvent.ACTION_DOWN) {
-							v.setBackground(resultPopup.getContext().getResources().getDrawable(
-									R.drawable.btn18));
-						} else if (event.getAction() == MotionEvent.ACTION_UP) {
-							v.setBackground(resultPopup.getContext().getResources().getDrawable(
-									R.drawable.btn17));
-						}
-						return false;
-					}
-				});*/
 
 	    	   playAgainButton.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
-//						playAgainButton.setBackground(resultPopup.getContext().getResources().getDrawable(R.drawable.button_bg_normal));
-						MainActivity.score = 0;
-						MainActivity.GAME_LEVEL = 1;
-						resultPopup.getContext().startActivity(new Intent(resultPopup.getContext(),
-								MainActivity.class));
+						if (interstitial.isReady()) {
+					          interstitial.show();
+					    }else{
+					    	MainActivity.score = 0;
+							MainActivity.GAME_LEVEL = 1;
+							resultPopup.getContext().startActivity(new Intent(resultPopup.getContext(),
+									MainActivity.class));
+					    }
 					}
 				});
 	    	   playAgainButton.setVisibility(View.VISIBLE);
@@ -110,7 +83,6 @@ public class CustomTimer {
 	    	   linearLayout.setOrientation(LinearLayout.VERTICAL);
 	    	   linearLayout.addView(popupText);
 	    	   linearLayout.addView(playAgainButton);
-//	    	   linearLayout.setPadding(50, 50, 50, 50);
 	    	   resultPopup.setContentView(linearLayout);
 	    	   resultPopup.show();
 	       }
@@ -140,5 +112,4 @@ public class CustomTimer {
 	public void setTimerButton(Button timerButton) {
 		this.timerButton = timerButton;
 	}
-
 }

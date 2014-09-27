@@ -1,69 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
     android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-	android:paddingTop="50dp"
-    android:background="@drawable/alert_bg">
+    android:orientation="vertical">
+<!-- android:background="@drawable/alert_bg"> -->
     
-    <com.google.ads.AdView
-        xmlns:googleads="http://schemas.android.com/apk/lib/com.google.ads"
+   <!--  <com.google.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 		ads:loadAdOnCreate="true"
         android:id="@+id/top_ad"
-        googleads:adSize="BANNER"
-        googleads:adUnitId="a15361716b05982" />
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-6324055048371015/5228326682" /> -->
+        <!-- googleads:adUnitId="a15361716b05982" /> -->
+        
     
-    <!-- <ImageView android:src="@drawable/logo_clicket" android:contentDescription="Clicket Logo" android:layout_width="match_parent" android:layout_height="match_parent"/> -->
-
-    <TextView
-        android:id="@+id/status"
+    <TableRow
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:width="500dp" /> 
+        android:layout_weight="1">
+	    
+	    <!-- android:src="@drawable/logo_clicket"  -->
+    	<ImageView android:id="@+id/logo_clicket" android:contentDescription="Clicket Logo" android:src="@drawable/logo_clicket"
+        	android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    </TableRow>
 
-    
-    <Button
-        android:id="@+id/btn_play"
+    <TableRow
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PLAY"
-        android:textSize="20sp"
-        android:width="500dp" 
-        android:onClick="play"/>
-    
-    <Button
-        android:id="@+id/btn_help"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="INSTRCTIONS"
-        android:textSize="20sp"
-        android:width="500dp" /> 
-
-    <Button
-        android:id="@+id/btn_hs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="HIGH SCORE"
-        android:textSize="20sp"
-        android:width="500dp" />
-
-    <Button
-        android:id="@+id/btn_level"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="LEVEL"
-        android:textSize="20sp"
-        android:width="500dp" />
-
-    <com.google.ads.AdView android:id="@+id/bottom_ad"
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         ads:adUnitId="a15361716b05982"
-                         ads:adSize="BANNER"
-                         ads:loadAdOnCreate="true"/>
-</LinearLayout>
+        android:layout_weight="1"
+        android:orientation="horizontal">
+    	
+        <TableLayout android:layout_width="wrap_content"
+    			android:layout_height="wrap_content"
+    			android:orientation="vertical">
+            <TableRow android:layout_width="wrap_content"
+    				android:layout_height="wrap_content"
+    				android:orientation="horizontal">
+			    <Button
+			        android:id="@+id/btn_play"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:background="@drawable/btn_play"
+			        android:onClick="play"
+			        android:contentDescription="PLAY"
+			        android:text="PLAY"
+			        android:layout_marginBottom="50dp"
+			        android:layout_marginRight="5dp"/>
+			    
+			    <Button
+			        android:id="@+id/btn_high_scores"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:background="@drawable/btn_high_scores"
+			        android:onClick="showHighScores"
+			        android:contentDescription="HIGH SCORES"
+			        android:text="HIGH SCORES"
+			        android:layout_marginBottom="50dp"
+			        android:layout_marginLeft="5dp"/>
+			</TableRow>
+			
+            <TableRow android:layout_width="wrap_content"
+    				android:layout_height="wrap_content"
+    				android:orientation="horizontal">
+			    <Button
+			        android:id="@+id/btn_help"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:background="@drawable/btn_help"
+			        android:onClick="showInstructions"
+			        android:contentDescription="HOW TO PLAY"
+			        android:text="HOW TO PLAY"
+			        android:layout_marginRight="5dp"/>
+			    
+			    <Button
+			        android:id="@+id/btn_theme"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:background="@drawable/btn_theme"
+			        android:onClick="changeTheme"
+			        android:contentDescription="FULL MOON"
+			        android:text="FULL MOON"
+			        android:layout_marginLeft="5dp"/>
+			</TableRow>			        
+			        
+		</TableLayout>
+	   
+	    
+	<!--     <Button
+	        android:id="@+id/btn_help"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="INSTRCTIONS"
+	        android:textSize="20sp"
+	        android:width="500dp" /> 
+	
+	    <Button
+	        android:id="@+id/btn_hs"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="HIGH SCORE"
+	        android:textSize="20sp"
+	        android:width="500dp" />
+	
+	    <Button
+	        android:id="@+id/btn_level"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="LEVEL"
+	        android:textSize="20sp"
+	        android:width="500dp" /> -->
+	
+	    <!-- <com.google.ads.AdView android:id="@+id/bottom_ad"
+	                         android:layout_width="match_parent"
+	                         android:layout_height="wrap_content"
+	                         ads:adUnitId="a15361716b05982"
+	                         ads:adSize="BANNER"
+	                         ads:loadAdOnCreate="true"/> -->
+	</TableRow>
+</TableLayout>

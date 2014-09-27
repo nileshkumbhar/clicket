@@ -13,12 +13,9 @@ public class HighScore implements Serializable{
 	private int level;
 	private long score;
 	
-	
 	public HighScore() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
-	
 	
 	public HighScore(int id, int level, long score) {
 		super();
@@ -26,7 +23,6 @@ public class HighScore implements Serializable{
 		this.level = level;
 		this.score = score;
 	}
-
 
 	public int getId() {
 		return id;
@@ -45,6 +41,5 @@ public class HighScore implements Serializable{
 	}
 	public void setScore(long score) {
 		this.score = score;
-	}
-	
+	}	
 }

@@ -1,35 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- <LinearLayout xmlns:android="http://schema.android.com/apk/res/android"
+<!--
+     <LinearLayout xmlns:android="http://schema.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content" 
 	android:orientation="horizontal"
-	android:id="@+id/linearLayout"> -->
+	android:id="@+id/linearLayout">
+-->
 
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/tableLayout1"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
- 
+    android:layout_height="fill_parent"
+    android:background="@android:color/darker_gray">
+
     <!-- 2 columns -->
     
     <TableRow
         android:id="@+id/tableRow2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="0dip" 
-        android:layout_weight="1">
-	    
-	    <GridLayout
-			android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
-	        android:columnCount="4"
-		    android:rowCount="1"
-	    	android:id="@+id/gridLayout">
-	    
-        
-	    
-        <!-- <Button
+        android:layout_weight="1"
+        android:padding="0dip" >
+
+        <GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:columnCount="4"
+            android:rowCount="1"
+            tools:targetApi="ice_cream_sandwich" >
+
+            <!--
+        <Button
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="1" 
@@ -56,29 +60,34 @@
 		android:layout_height="wrap_content"
 		android:text="4" 
 		android:textSize="40sp"
-		android:width="90dp"/>  -->
-		
-		</GridLayout>
-	
-<!-- </LinearLayout> -->
+		android:width="90dp"/>
+            -->
 
-	</TableRow>
-	
-    <TableRow
+        </GridLayout>
+
+        <!-- </LinearLayout> -->
+
+    </TableRow>
+
+    <!--
+     <TableRow
         android:id="@+id/tableRow1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="0dip" >
  
         <com.google.ads.AdView
-	        xmlns:googleads="http://schemas.android.com/apk/lib/com.google.ads"
+	        xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 			ads:loadAdOnCreate="true"
 	        android:id="@+id/top_main_ad"
-	        googleads:adSize="BANNER"
-	        googleads:adUnitId="a15361716b05982" />
+	        ads:adSize="BANNER"
+	        ads:adUnitId="ca-app-pub-6324055048371015/5228326682" />
+        
+        ads:adUnitId="a15361716b05982" 
         
      </TableRow>
-     
+    -->
+
 </TableLayout>
